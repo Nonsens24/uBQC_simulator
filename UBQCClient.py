@@ -9,6 +9,7 @@ class UBQCClient:
         self.theta = {}
         self.r = {}
         self.s = {}
+        self.output = {}
 
         for cmd in self.pattern.commands:
             if cmd.name == 'M':
@@ -32,6 +33,7 @@ class UBQCClient:
             print(f"Client received measurement of qubit {pos}: {result}")
         else:
             print("Output state: ", result)
+            self.output = result
 
     def _apply_dependencies(self, pos):
         for cmd in self.pattern.commands:
@@ -43,3 +45,6 @@ class UBQCClient:
                 phi_prime = (sign * phi + t_domain * math.pi) % (2 * math.pi)
                 return phi_prime
         raise ValueError(f"No measurement command found for {pos}")
+
+    def get_output_state(self):
+        return self.output
