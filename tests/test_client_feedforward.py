@@ -4,44 +4,46 @@ import unittest
 import numpy as np
 from UBQCClient import UBQCClient
 
+class MockClient(UBQCClient):
+    def __init__(self):
+        self.measurement_results = {}
+        self.x_dependencies = {}
+        self.z_dependencies = {}
+        self.phi_angles = {}
+        self.pattern = {}
+
 class TestUBQCFeedforward(unittest.TestCase):
     def test_apply_dependencies(self):
-        # Instantiate client with dummy layout and angles
-        dummy_layout = [[0]]  # 1x1 graph
-        dummy_phis = {(0, 0): np.pi / 4}
-        client = UBQCClient(dummy_layout, dummy_phis)
+        client = MockClient()
 
-        # Inject known measurement results
+        # Test position
+        pos = (0, 0)
+
+        # Set phi for this position
+        phi = np.pi / 4
+        client.phi_angles[pos] = phi
+
+        # Set known measurement outcomes
         client.measurement_results = {
             (0, 1): 1,
             (1, 0): 0,
             (1, 1): 1,
         }
 
-        # Set dependencies for (0,0)
-        client.x_dependencies = {
-            (0, 0): [(0, 1), (1, 1)]  # s_X = 1 XOR 1 = 0
-        }
-        client.z_dependencies = {
-            (0, 0): [(1, 0)]  # s_Z = 0
-        }
+        # s_X = 1 XOR 1 = 0, s_Z = 0
+        client.x_dependencies[pos] = [(0, 1), (1, 1)]
+        client.z_dependencies[pos] = [(1, 0)]
 
-        phi = np.pi / 4  # 45 degrees
-        expected_phi_prime = ((-1)**0) * phi + 0 * np.pi  # = phi
+        expected_phi_prime = phi % (2 * np.pi)
+        phi_prime = client._apply_dependencies(pos)
+        self.assertAlmostEqual(phi_prime, expected_phi_prime, places=7)
 
-        phi_prime = client._apply_dependencies(phi, 0, 0)
+        # Now set s_X = 1, s_Z = 1 → φ′ = −φ + π
+        client.x_dependencies[pos] = [(0, 1)]  # s_X = 1
+        client.z_dependencies[pos] = [(1, 1)]  # s_Z = 1
 
-        self.assertAlmostEqual(phi_prime, expected_phi_prime % (2 * np.pi), places=7)
-
-        # Now change dependency to make s_X = 1, s_Z = 1
-        client.x_dependencies[(0, 0)] = [(0, 1)]  # s_X = 1
-        client.z_dependencies[(0, 0)] = [(1, 1)]  # s_Z = 1
-
-        expected_phi_prime = ((-1)**1) * phi + np.pi  # = -phi + π
-        phi_prime = client._apply_dependencies(phi, 0, 0)
-
-        # normalize to [0, 2π]
-        expected_phi_prime = expected_phi_prime % (2 * np.pi)
+        expected_phi_prime = (-phi + np.pi) % (2 * np.pi)
+        phi_prime = client._apply_dependencies(pos)
 
         self.assertAlmostEqual(phi_prime, expected_phi_prime, places=7)
 
