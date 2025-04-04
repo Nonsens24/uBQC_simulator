@@ -7,7 +7,6 @@ from qiskit.quantum_info import Statevector, partial_trace
 from qiskit.quantum_info import partial_trace, Statevector
 from qiskit_aer import Aer
 
-
 from collections.abc import Iterable
 
 def extract_output_subcircuit(qc_full, qreg_map, output_pos_list):
@@ -64,10 +63,6 @@ class UBQCServer:
         # self.backend = AerSimulator(method='density_matrix')
         self.backend = AerSimulator(method='matrix_product_state') # WAAAAY FAster
 
-
-
-
-
     def measure_qubit(self, qubit_pos, angle):
         qubit_idx = self.qreg[qubit_pos]
 
@@ -110,44 +105,5 @@ class UBQCServer:
             # Optional: return directly if only outputs are in subcircuit
             return state.data  # Pure state of output qubits
 
-        # else:
-        #     print("Calculating output qubit state vector")
-        #     # Save full statevector
-        #     qc_temp.save_statevector()
-        #
-        #     print("1")
-        #     result = self.backend.run(qc_temp).result()
-        #     full_state = result.get_statevector()
-        #     print("2")
-        #     # Identify which qubits are output (by index)
-        #     # Suppose qubit_map is a dict like {(col, row): qubit_index}
-        #     output_qubits = self.pattern.output_
-        #     print("3")
-        #     # Now trace out everything else
-        #     all_qubits = list(range(qc_temp.num_qubits))
-        #     print("4")
-        #     non_output_qubits = list(set(all_qubits) - set(output_qubits))
-        #     print("5")
-        #     # Get reduced state
-        #     reduced_state = partial_trace(Statevector(full_state), non_output_qubits)
-        #     print("6")
-        #     # Optional: convert to state vector if pure
-        #     if reduced_state.is_pure():
-        #         output_state = reduced_state.data[:, 0]  # first (and only) column
-        #     else:
-        #         output_state = reduced_state  # it's a density matrix
-        #
-        #     return output_state
-
-            # qc_temp.save_statevector()
-            # print("state vector saved")
-            #
-            # # explicitly return the full state vector for the output qubit
-            # start = time.time()
-            # result = self.backend.run(qc_temp).result()
-            # statevector = result.get_statevector(qc_temp)
-            # print(f"Statevector extraction time for output qubit {qubit_pos}: ", time.time() - start)
-            #
-            # return statevector
 
 
