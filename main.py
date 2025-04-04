@@ -1,11 +1,18 @@
+from QCompute.OpenService.service_ubqc.client.qobject import Circuit
 from transpiler import transpile_to_bw_QCompute
 from UBQCClient import UBQCClient
 from UBQCServer import UBQCServer
 from visualiser import plot_brickwork_graph_bfk_format
+from circuits.qft import qft
 
 
 def main():
-    circuit = example_circuit()
+
+    n = 2
+    circuit = Circuit(n)
+    circuit = qft(circuit, n)
+    circuit.measure() # Circumvent unsupported qubit output states
+
     pattern = transpile_to_bw_QCompute(circuit)
 
     client = UBQCClient(pattern)
