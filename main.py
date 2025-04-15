@@ -126,9 +126,15 @@ def main():
         circuit = example_circuit()
 
         pattern = transpile_to_bw_QCompute(circuit)
+        pattern.print_command_list()
+
         # pattern.print_command_list()
 
         plot_brickwork_graph_bfk_format(pattern)
+
+        pattern.print_command_list()
+
+
 
         client = UBQCClient(pattern)
         server = UBQCServer(pattern)

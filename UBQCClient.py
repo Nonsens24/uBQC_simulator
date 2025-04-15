@@ -21,9 +21,10 @@ class UBQCClient:
                 pos = cmd.which_qubit
                 self.phi_angles[pos] = cmd.angle
                 self.theta[pos] = random.choice([k * math.pi / 4 for k in range(8)])
-                self.r[pos] = random.choice([0, 1])
+                self.r[pos] = 0 # random.choice([0, 1])
 
-                cmd.angle = self.theta[pos]  # Send theta explicitly to the server
+                # cmd.angle = self.theta[pos]  # Send theta explicitly to the server == test without
+
 
     def get_delta(self, pos):
         phi_prime = self._apply_dependencies(pos)
@@ -35,10 +36,10 @@ class UBQCClient:
     def receive_result(self, pos, result):
         if isinstance(result, int):
             self.s[pos] = result ^ self.r[pos]
-        elif isinstance(result, (Statevector, DensityMatrix)):
-            self.output = result
-        elif isinstance(result, (list, np.ndarray)):
-            self.output = Statevector(result)
+        # elif isinstance(result, (Statevector, DensityMatrix)):
+        #     self.output = result
+        # elif isinstance(result, (list, np.ndarray)):
+        #     self.output = Statevector(result)
         else:
             raise TypeError(f"❌ Invalid type received from server: {type(result)}")
 

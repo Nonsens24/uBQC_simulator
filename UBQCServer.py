@@ -134,17 +134,17 @@ class UBQCServer:
     def measure_qubit(self, qubit_pos, angle):
         qubit_idx = self.qreg[qubit_pos]
 
-        print("Measuring qubit: {}, idx: {}".format(qubit_pos, qubit_idx))
+        # print("Measuring qubit: {}, idx: {}".format(qubit_pos, qubit_idx))
 
         # Temporary circuit explicitly for each interactive measurement
-        # qc_temp = self.qc.copy()
+        qc_temp = self.qc.copy()
 
         # qc_temp.rz(-angle, qubit_idx)
         # qc_temp.h(qubit_idx)
         # qc_temp.measure(qubit_idx, qubit_idx)
-        self.qc.rz(-angle, qubit_idx)
-        self.qc.h(qubit_idx)
-        self.qc.measure(qubit_idx, qubit_idx)
+        qc_temp.rz(-angle, qubit_idx)
+        qc_temp.h(qubit_idx)
+        qc_temp.measure(qubit_idx, qubit_idx)
 
         qc_run = self.qc.copy()
 
@@ -157,6 +157,8 @@ class UBQCServer:
         job = self.backend.run(qc_run, shots=1)
         result = job.result()
         measured_str = list(result.get_counts().keys())[0][::-1]
+
+        print("outcome: {} of: {}".format(measured_str[qubit_idx], qubit_pos))
 
         return int(measured_str[qubit_idx])
         # else:
